@@ -1,31 +1,9 @@
+import json
+
 green = "\033[32m"
 reset = "\033[0m"
 yellow = "\033[93m"
 red = "\033[91m"
-
-namesDictionarys = {
-    "fma":  ["a força", "a massa", "a aceleração"],
-    "sovt": ["a posição final", "a posição inicial", "a velocidade", "o tempo"],
-    "voat": ["a velocidade final", "a velocidade inicial", "a aceleração", "o tempo"],
-}
-
-unitsDictionarys = {
-    "fma":  ["N", "Kg", "m/s²"],
-    "sovt": ["m", "m", "m/s", "s"],
-    "voat": ["m/s", "m/s", "m/s²", "s"],
-}
-
-formulae = {
-    "fma":  ["F = m*a", "m = F/a", "a = F/m"],
-    "sovt": ["S = S0 + V*t", "S0 = S - V*t", "V = (S - S0)/t", "t = (S - S0)/V"], 
-    "voat": ["V = V0 + a*t", "V0 = V - a*t", "a = (V - V0)/t", "t = (V - V0)/a"], 
-}
-
-attributeLetters = {
-    "fma":  {"F": '', "m": '', "a": ''},
-    "sovt": {"S": '', "S0": '', "V": '', "t": ''},
-    "voat": {"V": '', "V0": '', "a": '', "t": ''},
-}
 
 def printNames():
     print("Formulas Suportadas: ")
@@ -33,26 +11,27 @@ def printNames():
     print(" 2: S = S0 + V0*t")
     print(" 3: V = V0 + a*t")
 
-def calculate(formula, values):
+def calculate(formula, values, debug=False):
     # Reset the attributeLetters for this formula
-    for letter in attributeLetters[formula]:
-        attributeLetters[formula][letter] = ''
+    for letter in formula["attributes"]:
+        formula["attributes"][letter] = ''
     
     # Map values to their corresponding letters based on order
-    value_keys = list(attributeLetters[formula].keys())
+    value_keys = list(formula["attributes"].keys())
     
     for i, value in enumerate(values):
         if value.strip() == '':  # Empty value
-            attributeLetters[formula][value_keys[i]] = ''
+            formula["attributes"][value_keys[i]] = ''
         else:
             try:
-                attributeLetters[formula][value_keys[i]] = float(value)
+                formula["attributes"][value_keys[i]] = float(value)
+                # attributeLetters[formula][value_keys[i]] = float(value)
             except ValueError:
                 return f"{red}Erro: '{value}' não é um número válido{reset}"
 
     # Find which variable is empty (to be calculated)
     empty_var = None
-    for var, val in attributeLetters[formula].items():
+    for var, val in formula["attributes"].items():
         if val == '':
             if empty_var is None:
                 empty_var = var
@@ -64,7 +43,7 @@ def calculate(formula, values):
     
     # Find the correct formula that solves for the empty variable
     target_formula = None
-    for curr_formula in formulae[formula]:
+    for curr_formula in formula["formula"]:
         # Get the variable being solved (left side of equation)
         solved_var = curr_formula.split(" = ")[0].strip()
         if solved_var == empty_var:
@@ -78,7 +57,7 @@ def calculate(formula, values):
     expression = target_formula.split(" = ")[1].strip()
     
     # Replace variables with their values
-    sorted_vars = sorted(attributeLetters[formula].items(), key=lambda x: len(x[0]), reverse=True)
+    sorted_vars = sorted(formula["attributes"].items(), key=lambda x: len(x[0]), reverse=True)
     for var, val in sorted_vars:
         if val != '':  # Only replace non-empty variables
             expression = expression.replace(var, str(val))
@@ -87,12 +66,16 @@ def calculate(formula, values):
     try:
         result = eval(expression)
         
-        print(f"\n{result:.2f} = {expression}")
+        # print(f"\n{result:.2f} = {expression}")
         # Get the name and unit of the calculated variable
         var_index = value_keys.index(empty_var)
-        var_name = namesDictionarys[formula][var_index]
-        var_unit = unitsDictionarys[formula][var_index]
+       
+        var_name = formula["names"][var_index]
+        var_unit = formula["units"][var_index]
         
+        if debug:
+            return result
+
         return f"{green}Resultado:{reset}\n{yellow}{var_name.capitalize()} é de: {result:.3f} {var_unit}{reset}"
         
     except ZeroDivisionError:
@@ -111,19 +94,20 @@ def main():
             print(f"{red}Opção inválida{reset}\nEscolha entre 1, 2 ou 3")
         formula = input("Qual fórmula usar?\n> ")
             
-    translationMap = {
-        "1": "fma",
-        "2": "sovt",
-        "3": "voat",
-    }
-    selected = translationMap[formula]
+    translationMap = ["fma", "sovt", "voat"]
+        
+    with open('./formulas.json') as f:
+        # Load the json and then select the formula using the answer 
+        #                       Transforming the answer from string to int and reducing it by 1 to match the index
+        selected = json.load(f)[translationMap[int(formula)-1]]
+        f.close() # The file isn't needed anymore
     
     print(f"\n{yellow}Para calcular uma variável, deixe seu valor em branco{reset}")
     print("Insira os valores conhecidos normalmente\n")
     
     values = []
-    for i in range(len(namesDictionarys[selected])):
-        prompt = f"Insira o valor de {namesDictionarys[selected][i]} em {unitsDictionarys[selected][i]} (ou deixe em branco): "
+    for i in range(len(selected["names"])):
+        prompt = f"Insira o valor de {selected['names'][i]} em {selected['units'][i]} (ou deixe em branco): "
         values.append(input(prompt + "\n> "))
     
     result = calculate(selected, values)

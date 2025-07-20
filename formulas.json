@@ -1,0 +1,23 @@
+{
+  "fma": {
+    "names": ["a força", "a massa", "a aceleração"],
+    "units": ["N", "Kg", "m/s²"],
+    "formula": ["F = m*a", "m = F/a", "a = F/m"],
+    "attributes": {"F": "", "m": "", "a": ""}
+  },
+
+  "sovt": {
+    "names": ["a posição final", "a posição inicial", "a velocidade", "o tempo"],
+    "units": ["m", "m", "m/s", "s"],
+    "formula": ["S = S0 + V*t", "S0 = S - V*t", "V = (S - S0)/t", "t = (S - S0)/V"], 
+    "attributes": {"S": "", "S0": "", "V": "", "t": ""}
+  },
+
+  "voat": {
+    "names": ["a velocidade final", "a velocidade inicial", "a aceleração", "o tempo"],
+    "units": ["m/s", "m/s", "m/s²", "s"],
+    "formula": ["V = V0 + a*t", "V0 = V - a*t", "a = (V - V0)/t", "t = (V - V0)/a"], 
+    "attributes": {"V": "", "V0": "", "a": "", "t": ""}
+  }
+}
+
