@@ -26,8 +26,21 @@
      "gGmr": {
        "names": ["a constante de gravitação universal", "a gravidade", "a massa" , "o raio"],
        "units": ["n*m²/kg²", "m/s²", "kg", "m"],
-       "formula": ["g = G*m/r^2", "m = G*r^2/g", "r = sqrt(G*m/g)"],
-       "attributes": {"G": "6.67*10**-11 ", "g": "", "m": "", "r": ""}
+       "formula": ["g = G*m/r**2", "m = g*r**2/G", "r = (G*m/g)**0.5"],
+       "attributes": {"G": "6.6743e-11", "g": "", "m": "", "r": ""}
+    },
+    "v2gmr": {
+      "names": ["a velocidade", "a constante de gravitação universal", "a massa" , "o raio"],
+      "units": ["m/s", "n*m²/kg²", "kg", "m"],
+      "formula": ["v = (2*G*m/r)**0.5", "m = (v**2)*r/(2*G)", "r = (v**2)/(2*m*G)"],
+      "attributes": {"v": "", "G": "6.6743e-11", "m": "", "r": ""}
+    },
+    "fgm": {
+      "names": ["a força peso", "a gravidade", "a massa"],
+      "units": ["N", "m/s²", "kg"],
+      "formula": ["F = m*g", "g = F/m", "m = F/g"],
+      "requires": {"g": "gGmr"},
+      "attributes": {"F": "", "g": "", "m": ""}
     }
   } 
 }

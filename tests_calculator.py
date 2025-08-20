@@ -14,7 +14,7 @@ def addTest(categoria, formula, values, expected):
     if result == expected:
         print(f"Teste {formula} passou")
     else:
-        print(f"Teste {formula} falhou")
+        print(f"Teste {formula} falhou, result: {result}, expected: {expected}")
 
 
 print("Primeira lei de Newton")
@@ -38,5 +38,11 @@ print("Velocidade final")
 addTest("Física Básica","voat", ["", "-20", "-8", "5"], (-60, 'a velocidade final', 'm/s'))
 addTest("Física Básica","voat", ["40", "", "4", "5"], (20, 'a velocidade inicial', 'm/s'))
 addTest("Física Básica","voat", ["40", "20", "", "5"], (4, 'a aceleração', 'm/s²'))
-addTest("Física Básica","voat", ["-20", "20", "-4", ""], (10, 'o tempo', 's'))
+addTest("Física Básica","voat", ["-20", "20", "-4", ""], (10, 'o tempo', 's')) 
 
+
+print("-------------------------")
+print("Gravidade")
+addTest("Astronomia","gGmr", ["6.6743e-11", "", "5.972e24", "6.371e6"], (9.819973426224687, 'a gravidade', 'm/s²')) 
+addTest("Astronomia","gGmr", ["6.6743e-11", "9.819973426224687", "", "6.371e6"], (5.972e24, 'a massa', 'kg')) 
+addTest("Astronomia","gGmr", ["6.6743e-11", "9.819973426224687", "5.972e24", ""], (6.371e6, 'o raio', 'm')) 
