@@ -32,14 +32,14 @@
     "v2gmr": {
       "names": ["a velocidade", "a constante de gravitação universal", "a massa" , "o raio"],
       "units": ["m/s", "n*m²/kg²", "kg", "m"],
-      "formula": ["v = (2*G*m/r)**0.5", "m = (v**2)*r/(2*G)", "r = (v**2)/(2*m*G)"],
+      "formula": ["v = (2*G*m/r)**0.5", "m = (v**2)*r/(2*G)", "r = (2*m*G)/v**2"],
       "attributes": {"v": "", "G": "6.6743e-11", "m": "", "r": ""}
     },
     "fgm": {
       "names": ["a força peso", "a gravidade", "a massa"],
       "units": ["N", "m/s²", "kg"],
       "formula": ["F = m*g", "g = F/m", "m = F/g"],
-      "requires": {"g": "gGmr"},
+      "requires": {"g": ["Astronomia", "gGmr"]},
       "attributes": {"F": "", "g": "", "m": ""}
     }
   } 

@@ -54,7 +54,7 @@ def calculate(formula):
         var_name = formula["names"][var_index]
         var_unit = formula["units"][var_index]
         
-        return result, var_name, var_unit
+        return round(result, 5), var_name, var_unit
                 
     except ZeroDivisionError:
         raise ZeroDivisionError("Erro: Divisão por zero")
@@ -80,24 +80,40 @@ def selectFormula(data, dType):
         selected = int(input("Qual {} desejas usar?\n> ".format(dType))) -1 # The question itself
     return list(data)[selected] # returns the specified value
 
+def insertValues(selected, skipLetter="#"):
+    for i,v in enumerate(selected["attributes"]):
+        if selected["attributes"][v] != '' or v == skipLetter:
+            continue
+        
+        print(f"Insira o valor d{selected['names'][i]} em {selected['units'][i]} (ou deixe em branco): ")
+        selected["attributes"][v] = input(f"> ")
+
+
 def main():
     with open('./formulas.json') as f:
         data = json.load(f) # Load the data from the JSON
-        f.close() # The file isn't needed anymore
     
     category = selectFormula(data, "categoria") 
     formula = selectFormula(data[category], "fórmula")
     
     selected = data[category][formula]
+    
+    if "requires" in selected:
+        required = selected["requires"]
+        
+        for value in required.keys():
+            calculating = data [ required[value][0] ] [ required[value][1] ]
+
+            insertValues(calculating, value)
+            
+            result, var_name, var_unit = calculate(calculating)
+            
+            selected["attributes"][value] = result 
+
     print(f"\n{yellow}Para calcular uma variável, deixe seu valor em branco{reset}")
     print("Insira os valores conhecidos normalmente\n")
-    
-    for i,v in enumerate(selected["attributes"]):
-        if selected["attributes"][v] != '':
-            continue
-        
-        print(f"Insira o valor de {selected['names'][i]} em {selected['units'][i]} (ou deixe em branco): ")
-        selected["attributes"][v] = input(f"> ")
+
+    insertValues(selected)
 
     result, var_name, var_unit = calculate(selected)
     print(f"{green}Resultado:{reset}\n{yellow}{var_name} é de: {result:.3f} {var_unit}{reset}")
