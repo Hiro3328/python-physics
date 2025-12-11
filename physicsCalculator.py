@@ -34,23 +34,26 @@ def printNames():
     print(" 3: V = V0 + a*t")
 
 def calculate(formula, values):
-    # Reset the attributeLetters for this formula
+    # Redefine os valores em attributeLetters para esta fórmula
     for letter in attributeLetters[formula]:
         attributeLetters[formula][letter] = ''
     
-    # Map values to their corresponding letters based on order
+    # Cria uma lista com as letras da fórmula selecionada 
     value_keys = list(attributeLetters[formula].keys())
     
+    # Pega ambos o índice e o valor da lista 
     for i, value in enumerate(values):
-        if value.strip() == '':  # Empty value
+        if value.strip() == '':  
             attributeLetters[formula][value_keys[i]] = ''
         else:
+            # tenta transformar o valor em um número
             try:
                 attributeLetters[formula][value_keys[i]] = float(value)
             except ValueError:
+                # se nao conseguir ele mostra o erro
                 return f"{red}Erro: '{value}' não é um número válido{reset}"
 
-    # Find which variable is empty (to be calculated)
+    # Encontra qual variável está vazia (a que será calculada)
     empty_var = None
     for var, val in attributeLetters[formula].items():
         if val == '':
@@ -62,10 +65,10 @@ def calculate(formula, values):
     if empty_var is None:
         return f"{red}Erro: Deixe uma variável em branco para calcular{reset}"
     
-    # Find the correct formula that solves for the empty variable
+    # Encontra a fórmula correta que resolve para a variável vazia
     target_formula = None
     for curr_formula in formulae[formula]:
-        # Get the variable being solved (left side of equation)
+        # Separa a variável que está sendo resolvida ( a parte da esquerda da equação)
         solved_var = curr_formula.split(" = ")[0].strip()
         if solved_var == empty_var:
             target_formula = curr_formula
@@ -74,21 +77,21 @@ def calculate(formula, values):
     if target_formula is None:
         return f"{red}Erro: Não foi possível encontrar fórmula para {empty_var}{reset}"
     
-    # Extract the right side of the equation
+    # Extrai a parte da direita da equação
     expression = target_formula.split(" = ")[1].strip()
     
-    # Replace variables with their values
+    # Troca as letras por seus respectivos valores
     sorted_vars = sorted(attributeLetters[formula].items(), key=lambda x: len(x[0]), reverse=True)
     for var, val in sorted_vars:
-        if val != '':  # Only replace non-empty variables
+        if val != '':  # Troca apenas valores não vazios
             expression = expression.replace(var, str(val))
     
-    # Evaluate the expression
+    # Executa a expressão "como se fosse um código em python"
     try:
         result = eval(expression)
         
         print(f"\n{result:.2f} = {expression}")
-        # Get the name and unit of the calculated variable
+        # Pega o nome e a unidade da variável calculada
         var_index = value_keys.index(empty_var)
         var_name = namesDictionarys[formula][var_index]
         var_unit = unitsDictionarys[formula][var_index]
@@ -101,11 +104,11 @@ def calculate(formula, values):
         return f"{red}Erro no cálculo: {e}{reset}"
 
 def main():
-    # Shows the available formulae
+    # Mostra as fórmulas disponíveis
     printNames()
     formula = "0"
 
-    # Keep getting the selected formula while the user doesn't choose a valid one
+    # Enquanto o usuário não selecionar uma fórmula válida 
     while formula not in ["1", "2", "3"]:
         if formula != "0": 
             print(f"{red}Opção inválida{reset}\nEscolha entre 1, 2 ou 3")
@@ -116,12 +119,13 @@ def main():
         "2": "sovt",
         "3": "voat",
     }
-    selected = translationMap[formula]
+    selected = translationMap[formula] # pra transformar o número que ele escolheu no nome da fórmula
     
     print(f"\n{yellow}Para calcular uma variável, deixe seu valor em branco{reset}")
     print("Insira os valores conhecidos normalmente\n")
     
     values = []
+    # Usa os nomes das unidades pra evitar fazer um print específico para cada item 
     for i in range(len(namesDictionarys[selected])):
         prompt = f"Insira o valor de {namesDictionarys[selected][i]} em {unitsDictionarys[selected][i]} (ou deixe em branco): "
         values.append(input(prompt + "\n> "))
@@ -129,6 +133,8 @@ def main():
     result = calculate(selected, values)
     print(f"\n{result}\n\n")
 
+# Jeito do python de dizer pra só executar isso se for chamado diretamente
+# Fiz para poder adicionar testes sem eu ter que ficar mexendo no arquivo
 if __name__ == "__main__":
     while True:
         main()
